@@ -4,6 +4,7 @@
   # build
   qt6,
   quickshell,
+  makeWrapper,
   # runtime deps
   brightnessctl,
   cava,
