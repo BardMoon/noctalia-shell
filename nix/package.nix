@@ -1,18 +1,4 @@
 {
-  version ? "dirty",
-  extraPackages ? [ ],
-  runtimeDeps ? [
-    brightnessctl
-    cava
-    cliphist
-    ddcutil
-    wlsunset
-    wl-clipboard
-    imagemagick
-    wget
-    (python3.withPackages (pp: lib.optional calendarSupport pp.pygobject3))
-  ],
-
   lib,
   stdenvNoCC,
   # build
@@ -37,6 +23,8 @@
   libsoup_3,
   json-glib,
   gobject-introspection,
+  version ? "dirty",
+  extraPackages ? [ ],
 }:
 let
   src = lib.cleanSourceWith {
@@ -68,6 +56,21 @@ let
     json-glib
     gobject-introspection
   ];
+
+  runtimeDeps ? [
+    brightnessctl
+    cava
+    cliphist
+    ddcutil
+    wlsunset
+    wl-clipboard
+    imagemagick
+    wget
+    (if calendarSupport then
+      python3.withPackages (pp: [ pp.pygobject3 ])
+     else
+      python3)
+  ] ++ extraPackages;
 in
 stdenvNoCC.mkDerivation {
   pname = "noctalia-shell";
@@ -75,6 +78,7 @@ stdenvNoCC.mkDerivation {
 
   nativeBuildInputs = [
     qt6.wrapQtAppsHook
+    makeWrapper
   ];
 
   buildInputs = [
@@ -83,18 +87,19 @@ stdenvNoCC.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/noctalia-shell $out/bin
     cp -r . $out/share/noctalia-shell
     ln -s ${quickshell}/bin/qs $out/bin/noctalia-shell
-  '';
 
-  preFixup = ''
-    qtWrapperArgs+=(
-      --prefix PATH : ${lib.makeBinPath (runtimeDeps ++ extraPackages)}
-      --prefix XDG_DATA_DIRS : ${wayland-scanner}/share
-      --add-flags "-p $out/share/noctalia-shell"
+    makeWrapper ${quickshell}/bin/qs $out/bin/noctalia-shell \
+      --prefix PATH : ${lib.makeBinPath runtimeDeps} \
+      --prefix XDG_DATA_DIRS : ${wayland-scanner}/share \
+      --add-flags "-p $out/share/noctalia-shell" \
       ${lib.optionalString calendarSupport "--prefix GI_TYPELIB_PATH : ${giTypelibPath}"}
-    )
+
+    runHook postInstall
   '';
 
   meta = {
