@@ -57,7 +57,7 @@ let
     gobject-introspection
   ];
 
-  runtimeDeps ? [
+  runtimeDeps = [
     brightnessctl
     cava
     cliphist
