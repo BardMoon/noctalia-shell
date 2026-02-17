@@ -92,7 +92,6 @@ stdenvNoCC.mkDerivation {
 
     mkdir -p $out/share/noctalia-shell $out/bin
     cp -r . $out/share/noctalia-shell
-    ln -s ${quickshell}/bin/qs $out/bin/noctalia-shell
 
     makeWrapper ${quickshell}/bin/qs $out/bin/noctalia-shell \
       --prefix PATH : ${lib.makeBinPath runtimeDeps} \
