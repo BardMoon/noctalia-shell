@@ -87,6 +87,8 @@ stdenvNoCC.mkDerivation {
     qt6.qtmultimedia
   ];
 
+  propagatedBuildInputs = runtimeDeps;
+
   installPhase = ''
     runHook preInstall
 
