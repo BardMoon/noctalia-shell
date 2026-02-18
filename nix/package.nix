@@ -1,6 +1,6 @@
 {
   lib,
-  stdenvNoCC,
+  stdenv,
   # build
   qt6,
   quickshell,
@@ -73,7 +73,7 @@ let
       python3)
   ] ++ extraPackages;
 in
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   pname = "noctalia-shell";
   inherit version src;
 
